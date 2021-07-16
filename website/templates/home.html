@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
   <meta name="theme-color" content="#fafafa">
 </head>
@@ -27,6 +27,26 @@
         <header>
           <h1>Home Inventory Manager</h1>
         </header>
+      </div>
+      <div id="content" class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="messages alert-success ">
+              <ul class="flashes" >
+              {% for category, message in messages %}
+                <ol class="{{ category }}">{{ message }}</ol>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
+        <div class="col-md-12">
+          <h2> Add Product </h2>
+          <form id="add_product" action="/products" enctype="multipart/form-data" method="POST">
+            <input type="file" name="product_sku"/>
+            <button type="submit" class="btn btn-primary">Add Product</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
