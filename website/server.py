@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 from decoder import BarcodeReader
-from numpy import asarray
 
 app = Flask(__name__)
 app.secret_key = b'_6f\mra8\tu49&jgm\nnss]/'
