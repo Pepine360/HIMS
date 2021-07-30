@@ -42,10 +42,28 @@
         {% endwith %}
         <div class="col-md-12">
           <h2> Add Product </h2>
-          <form id="add_product" action="/products" enctype="multipart/form-data" method="POST">
+          <form id="add_product" action="/Products" enctype="multipart/form-data" method="POST">
+            <input type="text" name="itemName"/><br>
             <input type="file" name="product_sku"/>
             <button type="submit" class="btn btn-primary">Add Product</button>
           </form>
+        </div>
+        <div class="col-md-12">
+          <h2> Find product</h2>
+          <form id="find_product" action="/findProducts" enctype="multipart/form-data" method="POST">
+          <input type="text" name="productName"/><br>
+          <input type="file" name="product_code"/>
+          <button type="submit" class="btn btn-primary"> Find product </button>
+          </form>
+        </div>
+        <div class="container">
+          {% for item in data %}
+            <div class = "content">
+              <p> Name : {{ item[0] }}</p>
+              <p> Barcode : {{ item[1] }}</item></p>
+              <p> Amount : {{ item[2] }}</p>
+            </div>
+          {% endfor %}
         </div>
       </div>
     </div>
