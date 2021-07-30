@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from decoder import BarcodeReader
 from storage import storeData, loadData
 
+
 app = Flask(__name__)
 app.secret_key = b'_6f\mra8\tu49&jgm\nnss]/'
 
