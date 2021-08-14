@@ -28,6 +28,12 @@
           <h1>Home Inventory Manager</h1>
         </header>
       </div>
+      <!-- <div id="menu">
+        <button onclick="showAddProduct()"> Add Product</button>
+        <button onclick="showFindProduct()"> Find Product</button>
+        <button>List all items</button>
+        <button id="backToMenu" onclick="backToMenu()">Go back to menu</button>
+      </div> -->
       <div id="content" class="content">
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -40,28 +46,33 @@
             </div>
           {% endif %}
         {% endwith %}
-        <div class="col-md-12">
+        <div id="add_product" class="col-md-12">
           <h2> Add Product </h2>
-          <form id="add_product" action="/Products" enctype="multipart/form-data" method="POST">
+          <form  action="/Products" enctype="multipart/form-data" method="POST">
             <input type="text" name="itemName"/><br>
             <input type="file" name="product_sku"/>
             <button type="submit" class="btn btn-primary">Add Product</button>
           </form>
         </div>
-        <div class="col-md-12">
-          <h2> Find product</h2>
-          <form id="find_product" action="/findProducts" enctype="multipart/form-data" method="POST">
-          <input type="text" name="productName"/><br>
-          <input type="file" name="product_code"/>
-          <button type="submit" class="btn btn-primary"> Find product </button>
+        <div id="find_product" class="col-md-12">
+          <h2 > Find product</h2>
+          <form  action="/findProducts" enctype="multipart/form-data" method="POST">
+            <input type="text" name="productName"/><br>
+            <input type="file" name="product_code"/>
+            <button type="submit" class="btn btn-primary"> Find product </button>
           </form>
         </div>
-        <div class="container">
+        <div>
+          <form action="/listAll" enctype="multipart/form-data" method="GET">
+            <button type="submit" class="btn btn-primary">List all items</button>
+          </form>
+        </div>
+        <div class="container col-md-12">
           {% for item in data %}
-            <div class = "content">
-              <p> Name : {{ item[0] }}</p>
-              <p> Barcode : {{ item[1] }}</item></p>
-              <p> Amount : {{ item[2] }}</p>
+            <div class ="product content">
+              <p class="name"> Name : {{ item[0] }}</p>
+              <p class="barcode"> Barcode : {{ item[1] }}</item></p>
+              <p class="amount"> Amount : {{ item[2] }}</p>
             </div>
           {% endfor %}
         </div>
@@ -74,5 +85,6 @@
   <script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 
 </html>

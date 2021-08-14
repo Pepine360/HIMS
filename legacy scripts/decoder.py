@@ -1,7 +1,6 @@
 from pyzbar.pyzbar import decode
 import numpy as np
 from PIL import Image
-# import cv2
 
 
 def BarcodeReader(path):
@@ -16,5 +15,4 @@ def BarcodeReader(path):
             if barcode.data != "":
                 decodedBarcodes.append((barcode.data.decode('utf-8'), barcode.type))
     
-    print(decodedBarcodes)
     return decodedBarcodes

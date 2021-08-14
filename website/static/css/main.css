@@ -266,3 +266,44 @@ textarea {
   padding: 20px;
 }
 
+/* #add_product
+{
+  visibility: hidden;
+}
+
+#find_product
+{
+  visibility: hidden;
+}
+
+#backToMenu
+{
+  visibility: hidden;
+} */
+
+.product
+{
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid black;
+}
+
+.name
+{
+  color: red;
+  font-size : 24px
+}
+
+.barcode
+{
+  color:blue;
+  font-size : 20px;
+}
+
+.amount
+{
+  color : darkcyan;
+  font-size : 24px;
+}
+
+

@@ -12,6 +12,7 @@ def storeData(data, databaseName):
         con.commit()
         print("Data inserted")
     con.close()
+    
 
 def loadData(data, databaseName):
     with sql.connect(databaseName) as con:
@@ -24,3 +25,8 @@ def loadData(data, databaseName):
             result = "The data you are looking for does not exist!"
 
     return result
+
+def getAll(databaseName):
+    with sql.connect(databaseName) as con:
+        cur = con.cursor()
+        return cur.execute("select * from storage").fetchall()
