@@ -12,15 +12,26 @@ class Storage:
                 cur.execute("UPDATE storage SET amount = amount + ? where barcode == ?", (data.amount, data.barcode))
 
             else:
-                cur.execute("Insert Into storage (barcode, amount) values (?, ?)", (data.barcode, data.amount))
+                cur.execute("Insert Into storage (name, barcode, amount) values (?, ?)", (data.Name,data.Barcode, data.Amount))
 
             con.commit()
             print("Data Inserted")
         con.close()
         
     @classmethod
-    def ReadItem():
-        pass
+    def ReadItem(self, product : Product, databasePath : str = "storage.db"):
+        with sql.connect(databasePath) as con:
+            cur = con.cursor()
+            try:
+                data = cur.execute("SELECT * FROM storage WHERE barcode == (?) OR NAME == (?)", (product.barcode, product.name)).fetchall()
+            except:
+                data = "No Data Found"
+            
+        
+        
+        return {
+            "products" : [ item.GetProductData() for item in data ] if type(data) != str else data,
+        }
 
     @classmethod
     def UpdateItem():

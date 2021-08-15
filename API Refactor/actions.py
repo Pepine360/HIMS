@@ -1,6 +1,7 @@
 #flask-related classes
 from flask import request
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 
 #manipulation classes
 from pyzbar.pyzbar import decode
@@ -34,27 +35,35 @@ class Actions():
         return ValueError("No barcode found")
 
     #Method to save a file coming in from a request
-    #It takes the file as the argument, then saves it to the filesystem
+    #It takes the file (FileStorage type) as the argument, then saves it to the filesystem
     #It then return the path of the file
     #Can be used with the DecodeBarcode() method to get the request's file and decode it
     @classmethod
     def SaveFile(self, file):
-        filePath = f"./files/{secure_filename(file.filename)}"
-        file.save(filePath)
-        return filePath
+
+        if type(file) == FileStorage:
+            filePath = f"./files/{secure_filename(file.filename)}"
+            file.save(filePath)
+            return filePath
+        raise TypeError(f"{str(file)} is not a FileStorage object")
 
     @classmethod
     def HandleStorage(self, manipulation : str, item : Product, dbPath : str = "storage.db"):
         if manipulation.lower() == "create":
             Storage.CreateItem(item, dbPath)
         elif manipulation.lower() == "read":
-            Storage.ReadItem()
+            return Storage.ReadItem(item, dbPath)
         elif manipulation.lower() == "update":
             Storage.UpdateItem()
         elif manipulation.lower() == "delete":
             Storage.DeleteItem()
         else:
             raise WrongActionError("The action does not exist in the current context!")
+
+
+    @classmethod
+    def scrub(self, text : str):
+        return ("".join( char for char in text if char.isalnum() or char ==  '_')) if text != None else text
 
     #Method that takes in the barcode and returns all the products fitting the barcode
     #barcode : Product's barcode

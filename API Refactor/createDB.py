@@ -8,7 +8,7 @@ def scrub(text):
 @click.command()
 @click.option('--path', help="Database path")
 @click.option('--name', help="Table name")
-def databaseCreator(path, name):
+def databaseCreator(name, path = "storage.db"):
     con = sql.connect(path)
     print("Database created!")
 
