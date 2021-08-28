@@ -2,6 +2,7 @@ import sqlite3 as sql
 import click
 import string
 from flask import Flask
+from numpy.core.fromnumeric import product
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -26,16 +27,40 @@ class Product(db.Model):
         if __self__.count() > 0:
             item = Product.query.filter_by(barcode=__self__.barcode).first()
             item.amount += __self__.amount
+            item.name = __self__.name
             db.session.commit()
             return item
         else:
             db.session.add(__self__)
             db.session.commit()
             return __self__
-    
-    def find(barcode):
-        product = Product.query.filter_by(barcode=barcode).first()
-        return product
+    @classmethod
+    def find(__self__):
+        if __self__.barcode:
+            products = Product.query.filter_by(barcode=__self__.barcode).all()
+        elif __self__.name:
+            products = Product.query.filter_by(name=__self__.name).all()
+        elif __self__.amount:
+            products = Product.query.filter(Product.amount >= __self__.amount).all()
+        else:
+            products = Product.query().all()
+        return products
+
+    def delete(__self__):
+        try :
+            item = Product.query.filter_by(barcode=__self__.barcode).first()
+            db.session.delete(item)
+            db.session.commit()
+            return "Item Deleted!"
+        except :
+            return "Deletion Failed!"
+
+    def remove(__self__):
+        item = Product.query.filter_by(barcode = __self__.barcode).first()
+        item.amount -= __self__.amount
+        db.session.commit()
+        return item
+
         
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)

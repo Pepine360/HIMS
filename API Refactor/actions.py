@@ -43,23 +43,9 @@ class Actions():
         file.save(filePath)
         return filePath
 
-    @classmethod
-    def HandleStorage(self, manipulation : str, item : Product, dbPath : str = "storage.db"):
-        if manipulation.lower() == "create":
-            Storage.CreateItem(item, dbPath)
-        elif manipulation.lower() == "read":
-            Storage.ReadItem()
-        elif manipulation.lower() == "update":
-            Storage.UpdateItem()
-        elif manipulation.lower() == "delete":
-            Storage.DeleteItem()
-        else:
-            raise WrongActionError("The action does not exist in the current context!")
 
-    #Method that takes in the barcode and returns all the products fitting the barcode
-    #barcode : Product's barcode
-    #amount : Minimum amount of products for a specific barcode
-    # @classmethod
-    # def GetAllData(barcode: str, amount: int = 0) -> list(dict):
-    #     pass
+    @classmethod
+    def scrub(self, text):
+        return ("".join(char for char in text if char.isalnum() or char == '_')) if text != None else text
+
 

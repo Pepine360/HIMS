@@ -6,3 +6,6 @@ class WrongActionError(Error):
 
 class NotAnItemError(Error):
     pass
+
+class InvalidBarcodeError(Error):
+    pass
