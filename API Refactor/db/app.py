@@ -44,8 +44,11 @@ class Product(db.Model):
         elif __self__.amount:
             products = Product.query.filter(Product.amount >= __self__.amount).all()
         else:
-            products = Product.query().all()
+            return None
         return products
+
+    def FindAll(__self__):
+        return db.session.query(Product).limit(12).all()
 
     def Delete(__self__):
         try :

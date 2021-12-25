@@ -1,4 +1,5 @@
 from os import error
+import re
 from flask import Flask, request, jsonify, render_template
 from flask.helpers import url_for
 from werkzeug.datastructures import FileStorage
@@ -29,14 +30,14 @@ class ProductResources(Resource):
     def post(self):
         
         file = request.files.get("file")
-        amount = int(request.form["amount"])
+        amount = int(request.form["amount"]) if len(request.form["amount"]) > 0 else 0
         name = request.form["name"]
         action = request.form["action"]
 
         if action == "GetObject":
             return GetItem(file, amount, name)
         
-        elif action == "CreateItem":
+        elif action == "CreateObject":
             if type(file) == str:
                 raise TypeError(f"{file} is a string, not a FileSystem")
 
@@ -50,11 +51,11 @@ class ProductResources(Resource):
                 "amount": product.amount,
             }, 200, {'Access-Control-Allow-Origin': '*'}
         
-        # else:
-        #     return 400
+        else:
+            return 400
 
     def get(self):
-        querryResult = Product().Find()
+        querryResult = Product().FindAll()
 
         for item in querryResult:
             if item.barcode == "No barcodes detected":
@@ -71,12 +72,10 @@ class ProductResources(Resource):
             else "No Data Found"}, 200, {'Access-Control-Allow-Origin': '*'}
 
     def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", required=False)
-        args = parser.parse_args()
+        name = request.form["name"]
 
-        itemName = act.scrub(args["name"] if act.scrub(
-            args["name"]) != "" else "")
+        itemName = act.scrub(name if act.scrub(
+            name) != "" else "")
         file = request.files.get("file")
 
         if type(file) == str:
