@@ -3,30 +3,89 @@
     <head>
         <title>jQuery test API Calls</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"> </script>
-        <script>
-
-        </script>
     </head>
     <body>
-        <h1 id="result"></h1>
+
+        <div class="forms">
+            <div id="GetItem">
+                <span>
+                    <form id="info" enctype="multipart/form-data" method="post">
+                        <label for="productName">Item Name</label><br>
+                        <input type="text" id="productName" name="productName"><br>
+                        <label for="productAmount">Item Amount</label><br>
+                        <input type="text" id="productAmount" name="productAmount"><br>
+                        <label>Barcode Picture</label><br>
+                        <input type="file">
+                        <input type="hidden" id="action" name="action" value = "GetObject">
+
+                    </form>
+                    <button onclick="GetFormData()">Get item</button>
+                </span>
+            </div>
+        </div>
+
+        <h2>
+            <table id="result">
+                <tr>
+                    <td>Name</td>
+                    <td>Barcode</td>
+                    <td>Amount</td>
+                </tr>
+            </table>
+        </h2>
         <script>
             var elem = document.getElementById("result");
-            
-            var form = new FormData();
+            const http = new XMLHttpRequest();
 
-            var settings = {
-                "url": "192.168.2.25:5000/api/v1/product/",
-                "method": "GET",
-                "timeout": 0,
-                "processData": false,
-                "mimeType": "multipart/form-data",
-                "contentType": true,
-                "data": form
-            };
+            function GetFormData()
+            {
+                var form = new FormData(document.getElementById("info"));
+                var tempData = [];
+                // const url;
+                
+                for (item of form.values())
+                {
+                    tempData.push(item);
+                }
 
-            $.ajax(settings).done(function (response) {
-                elem.innerHTML = response;
-            });
+                var data = {"itemName" : tempData[0], "amount" : tempData[1], "file" : tempData[2], "action" : tempData[3]};
+                url = 'http://192.168.2.25:8000/api/v1/product/';
+                http.open("POST", url);
+                http.send(form);
+                // console.log(data);
+
+                http.onreadystatechange = (e) => {
+                    // console.log(http.responseText);
+                    // for(var item in http.responseText)
+                    // {
+                    //     NewRow(item);
+                    // }
+                    console.log("F");
+                };
+
+                // var form = new FormData();
+                // var settings = {
+                //     "url": "192.168.2.25:8000/api/v1/product/?name=Beans",
+                //     "method": "post",
+                //     "timeout": 0,
+                //     "processData": false,
+                //     "mimeType": "multipart/form-data",
+                //     "contentType": false,
+                //     "data": form
+                // };
+
+                // $.ajax(settings).done(function (response) {
+                //     console.log(response);
+                // });
+            }
+
+            // function NewRow(rowData)
+            // {
+            //     var row = table.insertRow();
+            //     var cell1 = row.incertCell(0);
+                
+            //     cell1.innerHTML = "Hello?";
+            // }
         </script>
     </body>
 </html>

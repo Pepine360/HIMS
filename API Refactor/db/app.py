@@ -20,11 +20,11 @@ class Product(db.Model):
     amount = db.Column(db.Integer, default=0)
     
         
-    def count(__self__):
+    def Count(__self__):
         return Product.query.filter_by(barcode=__self__.barcode).count()
 
-    def add(__self__):
-        if __self__.count() > 0:
+    def Add(__self__):
+        if __self__.Count() > 0:
             item = Product.query.filter_by(barcode=__self__.barcode).first()
             item.amount += __self__.amount
             item.name = __self__.name
@@ -34,8 +34,9 @@ class Product(db.Model):
             db.session.add(__self__)
             db.session.commit()
             return __self__
-    @classmethod
-    def find(__self__):
+    
+    
+    def Find(__self__):
         if __self__.barcode:
             products = Product.query.filter_by(barcode=__self__.barcode).all()
         elif __self__.name:
@@ -46,7 +47,7 @@ class Product(db.Model):
             products = Product.query().all()
         return products
 
-    def delete(__self__):
+    def Delete(__self__):
         try :
             item = Product.query.filter_by(barcode=__self__.barcode).first()
             db.session.delete(item)
@@ -55,7 +56,7 @@ class Product(db.Model):
         except :
             return "Deletion Failed!"
 
-    def remove(__self__):
+    def Remove(__self__):
         item = Product.query.filter_by(barcode = __self__.barcode).first()
         item.amount -= __self__.amount
         db.session.commit()

@@ -1,7 +1,9 @@
 from os import error
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask.helpers import url_for
 from werkzeug.datastructures import FileStorage
 from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 
 from actions import Actions as act
@@ -10,8 +12,10 @@ import errors as err
 
 app = Flask(__name__)
 
+cors = CORS(app, resources={r"/api/v1/product": {"origins": "*"}})
 
 app.config["DEBUG"] = True
+app.config["CORS_HEADERS"] = 'Content-Type'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/app.db'
 api = Api(app)
@@ -19,71 +23,43 @@ api = Api(app)
 db.create_all()
 db.init_app(app)
 
+
 #Create Product class that handles creating the object, decoding the data and saving it to the database
 class ProductResources(Resource):
     def post(self):
-        parser = reqparse.RequestParser()
-
-        #Adds the necessary arguments to the API call, then parses it once it comes in
-        # parser.add_argument("file", required = True, location='form', type = FileStorage)
-        # parser.add_argument("amount", required=True, type = int)
-        # args = parser.parse_args()
-
+        
         file = request.files.get("file")
         amount = int(request.form["amount"])
         name = request.form["name"]
+        action = request.form["action"]
 
-        if type(file) == str:
-            raise TypeError(f"{file} is a string, not a FileSystem")
-            
-        # Product.query.all()
-
-        #Creates the product from the parsed reqhest, then returns it's content and a 200 http code
-        barcode = act.DecodeBarcode(act.SaveFile(file))
-        product = Product(name=name, barcode=barcode, amount=amount).add()
-        # product = Product.find(barcode=barcode)
-
-        # response = jsonify()
-
-        # response.headers.add("Access-Control-Allow-Origin", "*")
-
-        return{
-        "name": product.name,
-        "barcode": product.barcode,
-        "amount": product.amount,
-        }, 200
-
-
-#Class that gets the products corresponding to the request arguments
-#Any product fitting the arguments will be returned
-# class GetProduct(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", required = False)
-        parser.add_argument("amount", required = False)
-        args = parser.parse_args()
-
-        itemName = act.scrub(args["name"] if act.scrub(args["name"]) != "" else "")
-        amount = (int(args['amount']) if int(args["amount"]) > 0 else 1) if args["amount"] != None else -1
-        file = request.files.get("file")
-
-        if type(file) == str:
-            raise TypeError(f"{file} is a string, not a FileSystem")
+        if action == "GetObject":
+            return GetItem(file, amount, name)
         
-        try:
-            barcode = act.DecodeBarcode(act.SaveFile(file))
-        except:
-            barcode = ""
+        elif action == "CreateItem":
+            if type(file) == str:
+                raise TypeError(f"{file} is a string, not a FileSystem")
 
-        querryResult = Product(name=itemName, barcode=barcode, amount=amount).Find()
+            #Creates the product from the parsed reqhest, then returns it's content and a 200 http code
+            barcode = act.DecodeBarcode(act.SaveFile(file))
+            product = Product(name=name, barcode=barcode, amount=amount).Add()
+
+            return {
+                "name": product.name,
+                "barcode": product.barcode,
+                "amount": product.amount,
+            }, 200, {'Access-Control-Allow-Origin': '*'}
+        
+        # else:
+        #     return 400
+
+    def get(self):
+        querryResult = Product().Find()
 
         for item in querryResult:
             if item.barcode == "No barcodes detected":
                 querryResult.remove(item)
 
-        # response = jsonify()
-
-        # response.headers.add("Access-Control-Allow-Origin", "*")
 
         return {"data": [{
             "Name": item.name,
@@ -92,7 +68,7 @@ class ProductResources(Resource):
             }
             for item in querryResult]
             if len(querryResult) > 0
-            else "No Data Found"}, 200
+            else "No Data Found"}, 200, {'Access-Control-Allow-Origin': '*'}
 
     def delete(self):
         parser = reqparse.RequestParser()
@@ -112,9 +88,9 @@ class ProductResources(Resource):
             raise err.InvalidBarcodeError(
                 "No barcodes were found. Aborting Request")
         
-        result = Product(name=itemName, barcode =barcode).delete()
+        result = Product(name=itemName, barcode =barcode).Delete()
 
-        return result, 200
+        return result, 200, {'Access-Control-Allow-Origin': '*'}
 
 
 
@@ -138,7 +114,7 @@ class ProductResources(Resource):
         if barcode == "No barcodes detected":
             raise err.InvalidBarcodeError("No barcodes were found. Aborting Request")
         
-        product = Product(name=itemName, barcode=barcode, amount=amount).remove()
+        product = Product(name=itemName, barcode=barcode, amount=amount).Remove()
 
         return {"data" :
             {
@@ -146,11 +122,31 @@ class ProductResources(Resource):
                 "barcode" : product.barcode,
                 "amount" : product.amount
             }
-        }, 200
+        }, 200, {'Access-Control-Allow-Origin': '*'}
 
+def GetItem(file, amount, name):
+    if type(file) == str:
+        raise TypeError(f"{file} is a string, not a FileSystem")
+    
+    try:
+        barcode = act.DecodeBarcode(act.SaveFile(file))
+    except:
+        barcode = ""
+    
+    querryResult = Product(
+        name=name, barcode=barcode, amount=amount).Find()
+
+    for item in querryResult:
+        if item.barcode == "No barcodes detected":
+            querryResult.remove(item)
+
+    return {"data": [{
+        "Name": item.name,
+        "barcode": item.barcode,
+        "amount": item.amount
+    }
+        for item in querryResult]
+        if len(querryResult) > 0
+        else "No Data Found"}, 200, {'Access-Control-Allow-Origin': '*'}
 
 api.add_resource(ProductResources, "/api/v1/product/")
-
-
-if __name__ == "__main__":
-    app.run(host="192.168.2.25", port='5000')
