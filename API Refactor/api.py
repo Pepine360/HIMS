@@ -135,17 +135,20 @@ def GetItem(file, amount, name):
     querryResult = Product(
         name=name, barcode=barcode, amount=amount).Find()
 
-    for item in querryResult:
-        if item.barcode == "No barcodes detected":
-            querryResult.remove(item)
+    if querryResult is not None:
+        for item in querryResult:
+            if item.barcode == "No barcodes detected":
+                querryResult.remove(item)
 
-    return {"data": [{
-        "Name": item.name,
-        "barcode": item.barcode,
-        "amount": item.amount
-    }
-        for item in querryResult]
-        if len(querryResult) > 0
-        else "No Data Found"}, 200, {'Access-Control-Allow-Origin': '*'}
+        return {"data": [{
+            "Name": item.name,
+            "barcode": item.barcode,
+            "amount": item.amount
+        }
+            for item in querryResult]
+            if len(querryResult) > 0
+            else "No Data Found"}, 200, {'Access-Control-Allow-Origin': '*'}
+    else:
+        return 400
 
 api.add_resource(ProductResources, "/api/v1/product/")
